@@ -24,11 +24,11 @@ executeCommand(3, Target, [NonMatch|Rest], [NonMatch|Tail]) :-
     executeCommand(3, Target, Rest, Tail).
 
 % Command 4 : Duplicate value at specified index
-executeCommand(4, 0, [Duplicable|Tail], [Duplicable,Duplicable|Tail]).
+executeCommand(4, 1, [Duplicable|Tail], [Duplicable,Duplicable|Tail]).
 executeCommand(4, _, [], []) :-
     write('Index out of bounds'), nl, fail.
 executeCommand(4, Index, [Iter|Rest], [Iter|Tail]) :-
-    Index > 0,
+    Index > 1,
     NewIndex is Index -1,
     executeCommand(4, NewIndex, Rest, Tail).
 
