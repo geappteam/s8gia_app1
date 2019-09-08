@@ -98,3 +98,10 @@ pile_best_actions(InitState, BestActionsPile) :-
 
     % Recusivity
     % TODO...
+plan_graph(_State, [none|PlanTail], [none|PlanTail]).
+plan_graph(State, [LastAction|PlanTail], FullActionPlan) :-
+    LastAction \= none,
+
+    ...,
+
+    plan_graph(State2, [NewAction,LastAction|PlanTail], FullActionPlan).
