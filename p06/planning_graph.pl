@@ -12,7 +12,7 @@ is_action(none).
 % any action and its benefit has first element of the stack.
 stack_best_actions(InitState, []) :-
     benefice(is_action(AnyAction), InitState, Benefice),
-    stack_best_actions(InitState, [[AnyAction|Benefice]|[]]).
+    stack_best_actions(InitState, [[AnyAction|Benefice]]).
 
 % + InitialState : Current environment's state.
 % - BestActionsStack : Stack of all possible actions after adding.
@@ -26,7 +26,8 @@ stack_best_actions(InitState, BestActionsStack) :-
 
 % + InitialState : Current environment's state.
 % + BestActionsStack : Stack of all possible actions with the best
-% action at the top. Note : Will not add to the stack.
+% action at the top.
+% Note : Will not add to the stack.
 stack_best_actions(InitState, BestActionsStack) :-
     benefice(is_action(BestAction), InitState, NewBenefice),
     peek_stack(BestActionsStack,[[TopAction|TopBenefice]|_]),
@@ -35,7 +36,8 @@ stack_best_actions(InitState, BestActionsStack) :-
 
 % + InitialState : Current environment's state.
 % + BestActionsStack : Stack of all possible actions with the best
-% action at the top. Note : Ensure to stop stacking when all
+% action at the top.
+% Note : Ensure to stop stacking when all
 % actions-of-all-directions' benefits have been analyzed.
 stack_best_actions(InitState, BestActionsStack) :-
     benefice(is_action(BestAction), InitState, NewBenefice),
@@ -81,28 +83,33 @@ stack_best_actions(InitState, BestActionsStack) :-
     member_stack([none|_], BestActionsStack).
 
 % + InitState : Initial state of the environment.
-% - ModifiedState : New state obtained after.
-% - [] : Empty ActionPlan queue of actions to do.
-%plan_graph(InitState, ModifiedState, []) :-
+% - BestAction : Best action possible among all possible actions giving
+% the current environment's state.
+get_best_action(InitState, BestAction) :-
+    stack_best_actions(InitState, [[BestAction|_]|_]).
 
-
-% + InitState : Initial state of the environment
-% + Goal : To validate as last element of the ActionPlan queue
-% - ModifiedState : New state obtained after
-% - ActionPlan : Queue of actions to do
-%plan_graph(InitState, ModifiedState, ActionPlan) :-
-    % Solve which action has the best benefit
-    stack_best_actions(InitState, BestActionsStack),
-
+% + InitState : Initial state of the environment.
+% - ActionPlan : Queue of actions to do.
+%plan_graph(InitState, ActionPlan) :-
+    % Solve which action has the best benefit giving the initial state
+    %get_best_action(InitState, BestAction),
 
     % The state of the environment has been changed
-    % TODO...
+    %modify_state(BestAction, InitState, NextInitialState),
 
-    % The action plan has been changed
-    % TODO ...
+    % Add next action to the action plan
+    %stack(BestAction, ActionPlan, NewActionPlan),
 
-    % Recusivity
-    % TODO...
+    % Check if top action plan is not none
+    %BestAction =/= none,
+
+    % Recursivity
+    %plan_graph(NextInitialState, NewActionPlan).
+
+% + InitState : Initial state of the environment
+% - ModifiedState : New state obtained after
+% - ActionPlan : Queue of actions to do
+%plan_graph(_, [none|_]).
 
 
 
