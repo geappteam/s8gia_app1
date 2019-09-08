@@ -1,4 +1,13 @@
 :- ensure_loaded(p06).
+:- ensure_loaded('../lib/set').
+
+% Valid state operations
+% move(Direction, OriginalState, TransformedState).
+% take(Directions, OriginalState, TransformedState).
+% drop(Directions, OriginalState, TransformedState).
+% attack(Directions, OriginalState, TransformedState).
+% none(OriginalState, OriginalState).
+
 
 move_player(1,[Id, Name, X, Y, B], [Id, Name, X, Yout, B]) :-
     Yout is Y + 1.
@@ -38,3 +47,15 @@ i_move(Direction, [OtherPlayer|Tail], [OtherPlayer|Rest]) :-
     p06_nom(Name),
     AiPlayer \= [_, Name, _, _, _],
     i_move(Direction, Tail, Rest).
+
+
+% Collision Detection to ensure validity of move
+noCollisions([_N, _M, _C, _R, PlayerList, BlockList]) :-
+    empty_set(EmptySet),
+    addPlayersToSet(PlayerList, EmptySet, PlayerSet),
+    addBlocksToSet(BlockList, PlayerSet, _).
+
+addBlocksToSet([], Set, Set).
+addBlocksToSet([[_Id, 
+
+
