@@ -5,19 +5,19 @@
 
 
 % Valid state operations
-modifyState(move(Direction), OriginalState, TransformedState) :-
+modify_state(move(Direction), OriginalState, TransformedState) :-
     between(1, 8, Direction),
     move(Direction, OriginalState, TransformedState).
-modifyState(take(Direction), OriginalState, TransformedState) :-
+modify_state(take(Direction), OriginalState, TransformedState) :-
     between(1, 8, Direction),
     take(Direction, OriginalState, TransformedState).
-modifyState(drop(Direction), OriginalState, TransformedState) :-
+modify_state(drop(Direction), OriginalState, TransformedState) :-
     between(1, 8, Direction),
     drop(Direction, OriginalState, TransformedState).
-modifyState(attack(Direction), OriginalState, TransformedState) :-
+modify_state(attack(Direction), OriginalState, TransformedState) :-
     between(1, 8, Direction),
     attack(Direction, OriginalState, TransformedState).
-modifyState(none, State, State).
+modify_state(none, State, State).
 
 
 
