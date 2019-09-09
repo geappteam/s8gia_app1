@@ -16,11 +16,20 @@ benefice(Action, BoardState, 0) :-
 
 % Evaluate quantitatively the state of the board
 stateEval(BoardState, Total) :-
-    heldBlockValue(BoardState, BlockValue),
+    blockReward(BoardState, BlockReward),
     potentialGain(BoardState, PotentialGain),
     threat_level(BoardState, ThreatLevel),
     Kb is 1, Kp is 1, Kt is 1,
-    Total is Kb * BlockValue + Kp * PotentialGain + Kt * ThreatLevel.
+    Total is Kb * BlockReward + Kp * PotentialGain - Kt * ThreatLevel.
+
+
+
+
+
+% Block Reward Heuristic
+blockReward(BoardState, BlockReward) :-
+    heldBlockValue(BoardState, BlockValue),
+    BlockReward is BlockValue ** 2.
 
 
 
@@ -53,6 +62,24 @@ threat_level(BoardState, ThreatLevel) :-
 
 
 
+% Compute Proximity to Winning Block Heuristic
+potentialGain(BoardState, BlockReward) :-
+    playerPosition(BoardState, PlayerPos),
+    playerGoalGradient(BoardState, Position, BlockReward).
+
+playerGoalGradient(BoardState, _Position, BlockReward) :-
+    heldBlockValue(BoardState, BlockReward),
+    maxBlockOnField(BoardState, [BlockReward, _BlockPos]), !.
+playerGoalGradient(BoardState, EvaluatedPosition, BlockReward) :-
+    maxBlockOnField(BoardState, [BlockValue, BlockPosition]),
+    distance(BlockPosition, EvaluatedPosition, Distance),
+    BlockReward is BlockValue / Distance.
+
+
+
+
+
+
 % Information about the game
 heldBlockValue([_N, _M, _C, _R, PlayerList, _B], PlayerBlockValue) :-
     p06_nom(Name),
@@ -61,6 +88,13 @@ heldBlockValue([_N, _M, _C, _R, PlayerList, _B], PlayerBlockValue) :-
 playerPosition([_N, _M, _C, _R, PlayerList, _B], [X, Y]) :-
     p06_nom(Name),
     member([_Id, Name, X, Y, _BV], PlayerList),!.
+
+distance([X1, Y1], [X2, Y2], Dx) :-
+    Dx is abs(X2 - X1),
+    Dy is abs(Y2 - Y1),
+    Dx > Dy, !.
+distance([X1, Y1], [X2, Y2], Dy) :-
+    Dy is abs(Y2 - Y1).
 
 
 
