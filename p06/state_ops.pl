@@ -91,6 +91,41 @@ drop(Direction, OriginalState, TransformedState) :-
 
 
 
+
+% Attack action
+attack(Direction, OriginalState, TransformedState) :-
+    p06_nom(Name),
+    OriginalState = [N, M, C, R, PlayerList, B],
+    member([_Id, Name, Xplayer, Yplayer, PlayerBlockValue], PlayerList),!,
+    directionTransform(Direction, [Xplayer, Yplayer], [Xtarget, Ytarget]),
+    member([TargetId, _Name, Xtarget, Ytarget, TargetBlockValue], PlayerList),!,
+    TargetBlockValue > 0,
+    i_attackEsp(PlayerBlockValue, TargetBlockValue, AttackerEsp, DefenderEsp),
+    i_updatePlayerBlock(AttackerEsp, PlayerList, Pl1),
+    i_updatePlayerBlockById(TargetId, DefenderEsp, Pl1, NewPlayerList),
+    TransformedState = [N, M, C, R, NewPlayerList, B].
+
+i_attackEsp(0, DefenderValue, AttackerEsp, DefenderEsp) :-
+    !,
+    i_valueEsp(0.25, DefenderValue, 0, AttackerEsp),
+    i_valueEsp(0.25, 0, DefenderValue, DefenderEsp).
+i_attackEsp(AttackerValue, DefenderValue, AttackEsp, DefendEsp) :-
+    SwapProb is AttackerValue / (AttackerValue + DefenderValue),
+    i_valueEsp(SwapProb, DefenderValue, AttackerValue, AttackEsp),
+    i_valueEsp(SwapProb, AttackerValue, DefenderValue, DefendEsp).
+
+i_valueEsp(ProbOfFirst, First, Second, Esp) :-
+    Esp is ProbOfFirst * First + (1 - ProbOfFirst) * Second.
+
+i_updatePlayerBlockById(TargetId, BlockValue, [[TargetId, Name, X, Y, _Block]|BlockListTail], [[TargetId, Name, X, Y, BlockValue]|BlockListTail]) :- !.
+i_updatePlayerBlockById(TargetId, BlockValue, [NoMatch|BlockListTail], [NoMatch|NewBlockListTail]) :-
+    i_updatePlayerBlockById(TargetId, BlockValue, BlockListTail, NewBlockListTail).
+
+
+
+
+
+
 % Handling direction transformations
 directionTransform(1, [X, Y], [X, Yout]) :- Yout is Y + 1.
 directionTransform(2, [X, Y], [Xout, Y]) :- Xout is X + 1.
