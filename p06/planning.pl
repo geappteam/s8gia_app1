@@ -1,10 +1,10 @@
 % Actions definitions
 % + Any of the five possible actions.
 % Note : Helps categorize 'actions with any directions'.
-is_action(move(Direction)).
-is_action(attack(Direction)).
-is_action(drop(Direction)).
-is_action(take(Direction)).
+is_action(move(_Direction)).
+is_action(attack(_Direction)).
+is_action(drop(_Direction)).
+is_action(take(_Direction)).
 is_action(none).
 
 % + InitialState : Current environment's state.
@@ -20,7 +20,7 @@ stack_best_actions(InitState, []) :-
 % Note : Will add to the stack.
 stack_best_actions(InitState, BestActionsStack) :-
     benefice(is_action(BestAction), InitState, NewBenefice),
-    peek_stack(BestActionsStack,[[TopAction|TopBenefice]|_]),
+    peek_stack(BestActionsStack,[[_TopAction|TopBenefice]|_]),
     TopBenefice < NewBenefice,
     stack_best_actions(InitState, [[BestAction|NewBenefice]|BestActionsStack]).
 
@@ -29,8 +29,8 @@ stack_best_actions(InitState, BestActionsStack) :-
 % action at the top.
 % Note : Will not add to the stack.
 stack_best_actions(InitState, BestActionsStack) :-
-    benefice(is_action(BestAction), InitState, NewBenefice),
-    peek_stack(BestActionsStack,[[TopAction|TopBenefice]|_]),
+    benefice(is_action(_BestAction), InitState, NewBenefice),
+    peek_stack(BestActionsStack,[[_TopAction|TopBenefice]|_]),
     TopBenefice >= NewBenefice,
     stack_best_actions(InitState, BestActionsStack).
 
@@ -40,8 +40,8 @@ stack_best_actions(InitState, BestActionsStack) :-
 % Note : Ensure to stop stacking when all
 % actions-of-all-directions' benefits have been analyzed.
 stack_best_actions(InitState, BestActionsStack) :-
-    benefice(is_action(BestAction), InitState, NewBenefice),
-    peek_stack(BestActionsStack,[[TopAction|TopBenefice]|_]),
+    benefice(is_action(_AnyAction), InitState, NewBenefice),
+    peek_stack(BestActionsStack,[[_TopAction|TopBenefice]|_]),
     TopBenefice >= NewBenefice,
 
     member_stack([move(1)|_], BestActionsStack),
@@ -89,27 +89,26 @@ get_best_action(InitState, BestAction) :-
     stack_best_actions(InitState, [[BestAction|_]|_]).
 
 % + InitState : Initial state of the environment.
-% - ActionPlan : Queue of actions to do.
-%plan_graph(InitState, ActionPlan) :-
+% + ActionPlan : Queue of actions to do so far.
+% - NewActionPlan : New queue of actions to do.
+% Note : Outputs NewActionPlan equals to ActionPlan
+make_plan(_InitState, [none|PlanTail], [none|PlanTail]).
+
+% + InitState : Initial state of the environment.
+% + ActionPlan : Queue of actions to do.
+% - NewActionPlan : New queue of actions to do.
+make_plan(InitState, [PlanTop|PlanTail], NewActionPlan) :-
+    PlanTop \= none,
+
     % Solve which action has the best benefit giving the initial state
-    %get_best_action(InitState, BestAction),
+    get_best_action(InitState, BestAction),
 
     % The state of the environment has been changed
-    %modify_state(BestAction, InitState, NextInitialState),
+    modify_state(BestAction, InitState, InitState2),
 
-    % Add next action to the action plan
-    %stack(BestAction, ActionPlan, NewActionPlan),
+    % Recursivity & add next action to the action plan
+    make_plan(InitState2, [BestAction,PlanTop|PlanTail], NewActionPlan).
 
-    % Check if top action plan is not none
-    %BestAction =/= none,
-
-    % Recursivity
-    %plan_graph(NextInitialState, NewActionPlan).
-
-% + InitState : Initial state of the environment
-% - ModifiedState : New state obtained after
-% - ActionPlan : Queue of actions to do
-%plan_graph(_, [none|_]).
 
 
 
