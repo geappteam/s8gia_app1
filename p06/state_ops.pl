@@ -66,9 +66,26 @@ i_updateBlockCount(M, _, M).
 
 i_updatePlayerBlock(NewBlock, [[Id, Name, X, Y, _B]|PlayerList], [[Id, Name, X, Y, NewBlock]|PlayerList]) :-
     p06_nom(Name),!.
-i_updatePlayerBlock(NewBlock, [[Id, Name, X, Y, B]|PlayerListTail], [[Id, Name, X, Y, B]|TransformedPlayerList]) :-
+i_updatePlayerBlock(NewBlock, [NoMatchPlayer|PlayerListTail], [NoMatchPlayer|TransformedPlayerList]) :-
     i_updatePlayerBlock(NewBlock, PlayerListTail, TransformedPlayerList).
 
+
+
+
+
+% Drop action
+drop(Direction, OriginalState, TransformedState) :-
+    p06_nom(Name),
+    OriginalState = [N, M, C, R, PlayerList, BlockList],
+    member([_Id, Name, Xplayer, Yplayer, PlayerBlockValue], PlayerList),!,
+    PlayerBlockValue > 0,
+    NewM is M + 1,
+    directionTransform(Direction, [Xplayer, Yplayer], [Xblock, Yblock]),
+    positionInbound([C, R], [Xblock, Yblock]),
+    NewBlockList = [[PlayerBlockValue, Xblock, Yblock]|BlockList],
+    i_updatePlayerBlock(0, PlayerList, NewPlayerList),
+    TransformedState = [N, NewM, C, R, NewPlayerList, NewBlockList],
+    noCollisions(TransformedState).
 
 
 
@@ -115,12 +132,14 @@ noObjectsOutOfBounds([_N, _M, Columns, Rows, PlayerList, BlockList]) :-
 
 noPlayerOutOfBounds(_Columns, _Rows, []).
 noPlayerOutOfBounds(Columns, Rows, [[_Id, _Nom, X, Y, _B]|PlayerListTail]) :-
-    X >= 0, X < Columns,
-    Y >= 0, Y < Rows,
+    positionInbound([Columns, Rows], [X, Y]),
     noPlayerOutOfBounds(Columns, Rows, PlayerListTail).
 
 noBlockOutOfBounds(_Columns, _Rows, []).
 noBlockOutOfBounds(Columns, Rows, [[_Id, X, Y]|BlockListTail]) :-
-    X >= 0, X < Columns,
-    Y >= 0, Y < Rows,
+    positionInbound([Columns, Rows], [X, Y]),
     noBlockOutOfBounds(Columns, Rows, BlockListTail).
+
+positionInbound([C, R], [X, Y]) :-
+    X >= 0, X < C,
+    Y >= 0, Y < R.
