@@ -86,15 +86,16 @@ get_best_action(InitState, BestAction) :-
 % + InitState : Initial state of the environment.
 % + ActionPlan : Queue of actions to do so far.
 % - NewActionPlan : New queue of actions to do.
-% Note : Outputs NewActionPlan equals to ActionPlan
-make_plan(_InitState, [none|PlanTail], [none|PlanTail]).
+% Note : Outputs NewActionPlan equals to ActionPlan. Stops recursivity
+% once 'none' action appears as last best action to do.
+make_plan(_InitState, Plan, Plan) :-
+     member_stack(none, Plan).
 
 % + InitState : Initial state of the environment.
-% + ActionPlan : Queue of actions to do.
+% + ActionPlan : Empty queue of actions to do so far.
 % - NewActionPlan : New queue of actions to do.
-make_plan(InitState, [PlanTop|PlanTail], NewActionPlan) :-
-    PlanTop \= none,
-
+% Note : Initialized ActionPlan when the queue is empty.
+make_plan(InitState, [], NewActionPlan) :-
     % Solve which action has the best benefit giving the initial state
     get_best_action(InitState, BestAction),
 
@@ -102,7 +103,25 @@ make_plan(InitState, [PlanTop|PlanTail], NewActionPlan) :-
     modify_state(BestAction, InitState, InitState2),
 
     % Recursivity & add next action to the action plan
-    make_plan(InitState2, [BestAction,PlanTop|PlanTail], NewActionPlan).
+    make_plan(InitState2, [BestAction], NewActionPlan).
+
+% + InitState : Initial state of the environment.
+% + ActionPlan : Queue of actions to do.
+% - NewActionPlan : New queue of actions to do.
+make_plan(InitState, InitialPlan, NewActionPlan) :-
+    \+ member_stack(none, InitialPlan),
+
+    % Solve which action has the best benefit giving the initial state
+    get_best_action(InitState, BestAction),
+
+    % The state of the environment has been changed
+    modify_state(BestAction, InitState, InitState2),
+
+    % Append new action at the end
+    append([BestAction], InitialPlan, IncrementalPlan),
+
+    % Recursivity & add next action to the action plan
+    make_plan(InitState2, IncrementalPlan, NewActionPlan).
 
 
 
