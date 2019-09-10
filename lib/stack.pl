@@ -1,5 +1,5 @@
 %------------------------------------------------------------------------------
-% Structure de données de pile
+% Structure de donnÃ©es de pile
 % Auteur: Charles-Antoine Brunet
 %------------------------------------------------------------------------------
 % Version 1.0: Version initiale
@@ -7,20 +7,20 @@
 %------------------------------------------------------------------------------
 
 %------------------------------------------------------------------------------
-% +: paramètre en entrée
-% -: paramètre en sortie
-% ?: paramètre en entrée ou sortie
+% +: paramÃ¨tre en entrÃ©e
+% -: paramÃ¨tre en sortie
+% ?: paramÃ¨tre en entrÃ©e ou sortie
 %------------------------------------------------------------------------------
 
 %------------------------------------------------------------------------------
-% Test si une pile est vide ou créer une pile
+% Test si une pile est vide ou crÃ©er une pile
 % empty_stack(?Stack)
 %------------------------------------------------------------------------------
 empty_stack([]).
 
 %------------------------------------------------------------------------------
 % Pousser (push) et enlever (pop) un item sur une pile
-% push : stack(+X, +Y, -Z), X=item à ajouter, Y=ancienne pile, Z=nouvelle pile
+% push : stack(+X, +Y, -Z), X=item Ã  ajouter, Y=ancienne pile, Z=nouvelle pile
 % pop: stack(-X, -Y, +Z), X=item dessus, Y=nouvelle pile, Z=ancienne pile
 %------------------------------------------------------------------------------
 stack(Top, Stack, [Top|Stack]).
@@ -33,16 +33,16 @@ stack(Top, Stack, [Top|Stack]).
 peek_stack(Top,[Top|_]).
 
 %------------------------------------------------------------------------------
-% Vérifier si un item est membre d'une pile
+% VÃ©rifier si un item est membre d'une pile
 % Utilise la fonction member de la librairie standard de liste
 % member_stack(+Item, +Stack)
 %------------------------------------------------------------------------------
 member_stack(Item, Stack) :- member(Item, Stack).
 
 %------------------------------------------------------------------------------
-% Ajouter une liste d'items à une pile
+% Ajouter une liste d'items Ã  une pile
 % add_list_to_stack(+List, +Stack, -NewStack)
-% List=liste à ajouter, Stack=ancienne pile, NewStack=nouvelle pile
+% List=liste Ã  ajouter, Stack=ancienne pile, NewStack=nouvelle pile
 % Utilise la fonction append de la librairie standard de liste
 %------------------------------------------------------------------------------
 add_list_to_stack(List, Stack, NewStack) :- append(List, Stack, NewStack).

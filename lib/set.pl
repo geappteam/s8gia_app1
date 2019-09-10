@@ -1,6 +1,6 @@
 %------------------------------------------------------------------------------
-% Structure de données de set (collection),
-%   Le set est sans dupliqués et les valeurs ne sont pas ordonnées
+% Structure de donnÃ©es de set (collection),
+%   Le set est sans dupliquÃ©s et les valeurs ne sont pas ordonnÃ©es
 %
 % Auteur: Charles-Antoine Brunet
 %------------------------------------------------------------------------------
@@ -9,37 +9,37 @@
 %------------------------------------------------------------------------------
 
 %------------------------------------------------------------------------------
-% +: paramètre en entrèe
-% -: paramètre en sortie
-% ?: paramètre en entrèe ou sortie
+% +: paramÃ¨tre en entrÃ¨e
+% -: paramÃ¨tre en sortie
+% ?: paramÃ¨tre en entrÃ¨e ou sortie
 %------------------------------------------------------------------------------
 
 %------------------------------------------------------------------------------
-% Tester si un set est vide ou créer un set
+% Tester si un set est vide ou crÃ©er un set
 % empty_set(?Set)
 %------------------------------------------------------------------------------
 empty_set([]).
 
 %------------------------------------------------------------------------------
-% Vérifier si un élément est membre d'un set
+% VÃ©rifier si un Ã©lÃ©ment est membre d'un set
 % Utilise la fonction member de la librairie standard de liste
 % member_set(+Item, +Set)
 %------------------------------------------------------------------------------
 member_set(E, S) :- member(E, S).
 
 %------------------------------------------------------------------------------
-% Enlever un élément du set, s'il est présent
+% Enlever un Ã©lÃ©ment du set, s'il est prÃ©sent
 % delete_in_set(+Item, +Set, -NewSet)
-% Item=item à enlever, Set = ancien set, NewSet = nouveau set
+% Item=item Ã  enlever, Set = ancien set, NewSet = nouveau set
 %------------------------------------------------------------------------------
 delete_in_set(_, [], []) :- !.
 delete_in_set(E, [E|T], T) :- !.
 delete_in_set(E, [H|T], [H|Tnew]) :- delete_in_set(E,T,Tnew).
 
 %------------------------------------------------------------------------------
-% Ajouter un élément au set, s'il n'est pas présent
+% Ajouter un Ã©lÃ©ment au set, s'il n'est pas prÃ©sent
 % add_in_set(+Item, +Set, -NewSet)
-% Item=item à ajouter, Set = ancien set, NewSet = nouveau set
+% Item=item Ã  ajouter, Set = ancien set, NewSet = nouveau set
 %------------------------------------------------------------------------------
 add_in_set(E, S, S) :- member(E,S), !.
 add_in_set(E, S, [E|S]).
@@ -53,16 +53,16 @@ set_union([], S, S).
 set_union([H|T], S, Snew) :- set_union(T, S, Tmp), add_in_set(H, Tmp, Snew).
 
 %------------------------------------------------------------------------------
-% Vérifier si un set est un sous-ensemble d'un autre
+% VÃ©rifier si un set est un sous-ensemble d'un autre
 % sub_set(+Set1, +Set2) est vrai si Set1 est un sous-ensemble de Set2.
 %------------------------------------------------------------------------------
 sub_set([],_).
 sub_set([H|T], S) :- member_set(H,S), sub_set(T,S).
 
 %------------------------------------------------------------------------------
-% Trouver les éléments communs à 2 sets
+% Trouver les Ã©lÃ©ments communs Ã  2 sets
 % set_intersection(+Set1, +Set2, -Intersection)
-% Intersection contient les items communs à Set1 et Set2.
+% Intersection contient les items communs Ã  Set1 et Set2.
 %------------------------------------------------------------------------------
 set_intersection([], _, []).
 set_intersection([H|T],S,[H|Snew]) :-
@@ -70,9 +70,9 @@ set_intersection([H|T],S,[H|Snew]) :-
 set_intersection([_|T],S,Snew) :- set_intersection(T, S, Snew).
 
 %------------------------------------------------------------------------------
-% Calculer la différence entre 2 sets.
+% Calculer la diffÃ©rence entre 2 sets.
 % set_difference(+Set1,+Set2,-Difference)
-% Différence contient les éléments qui sont dans Set1 mais pas dans Set2
+% DiffÃ©rence contient les Ã©lÃ©ments qui sont dans Set1 mais pas dans Set2
 %------------------------------------------------------------------------------
 set_difference([], _, []).
 set_difference([H|T], S, Tnew) :-
@@ -80,7 +80,7 @@ set_difference([H|T], S, Tnew) :-
 set_difference([H|T], S, [H|Tnew]) :- set_difference(T,S,Tnew).
 
 %------------------------------------------------------------------------------
-% Vérifier si 2 sets sont équivalents
+% VÃ©rifier si 2 sets sont Ã©quivalents
 % equal_set(+S1, +S2)
 % Vrai si tous membres de Set1 sont dans Set2 et ceux de Set2 dans Set1
 %------------------------------------------------------------------------------
