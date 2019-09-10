@@ -1,23 +1,31 @@
 :- ensure_loaded('../lib/stack').
 :- ensure_loaded(actions).
 
-get_best_action([Action,Benefice],[Action,Benefice]).
+get_best_action([Action,Benefice],[Action,Benefice]) :-
+   write('Action :'), write(Action), nl,nl,
+   write('Benefice :'), write(Benefice), nl,nl.
 
 get_best_action([[_TopAction,TopBenefice],[SecondAction,SecondBenefice]], [[SecondAction,SecondBenefice]]) :-
+    %write(SecondAction), nl,nl,
+    %write(SecondBenefice), nl,nl,
     TopBenefice < SecondBenefice.
 
 get_best_action([[TopAction,TopBenefice],[_SecondAction,SecondBenefice]], [TopAction,TopBenefice]) :-
+    %write(TopAction), nl,nl,
+    %write(TopBenefice), nl,nl,
     TopBenefice >= SecondBenefice.
 
 get_best_action([[_TopAction,TopBenefice],[SecondAction,SecondBenefice]|Tail], BestActionBenefice) :-
     TopBenefice < SecondBenefice,
-    %potential debug :add append with tail first?
-    order_list_top_benefice([[SecondAction,SecondBenefice],Tail],BestActionBenefice).
+    append([[SecondAction,SecondBenefice]], Tail, DecrementalActionBeneficeList),
+    %write([[TopAction,TopBenefice],[SecondAction,SecondBenefice]|Tail]), nl,nl,
+   get_best_action(DecrementalActionBeneficeList,BestActionBenefice).
 
-get_best_action([[TopAction|TopBenefice],[_SecondAction|SecondBenefice]|Tail], BestActionBenefice) :-
+get_best_action([[TopAction,TopBenefice],[_SecondAction,SecondBenefice]|Tail], BestActionBenefice) :-
     TopBenefice >= SecondBenefice,
-    %potential debug :add append with tail first?
-    order_list_top_benefice([[TopAction|TopBenefice],Tail],BestActionBenefice).
+    append([[TopAction,TopBenefice]], Tail, DecrementalActionBeneficeList),
+    %write([[TopAction,TopBenefice],[SecondAction,SecondBenefice]|Tail]), nl,nl,
+    get_best_action(DecrementalActionBeneficeList,BestActionBenefice).
 
 % + InitState : Initial state of the environment.
 % + ActionPlan : Queue of actions to do so far.
@@ -33,7 +41,7 @@ make_plan(_InitState, Plan, Plan) :-
 % Note : Initialized ActionPlan when the queue is empty.
 make_plan(InitState, [], NewActionPlan) :-
     % Solve which action has the best benefit giving the initial state
-    findall(ActionBenefice, benefice(ActionBenefice, InitState, _Benefice), AllPotentialActionsBenefice),
+    findall([Action,Benefice], benefice(Action, InitState, Benefice), AllPotentialActionsBenefice),
     get_best_action(AllPotentialActionsBenefice, [BestAction|_BestBenefice]),
 
     % The state of the environment has been changed
@@ -49,7 +57,7 @@ make_plan(InitState, InitialPlan, NewActionPlan) :-
     \+ member_stack(none, InitialPlan),
 
     % Solve which action has the best benefit giving the initial state
-    findall(ActionBenefice, benefice(ActionBenefice, InitState, _Benefice), AllPotentialActionsBenefice),
+    findall([Action,Benefice], benefice(Action, InitState, Benefice), AllPotentialActionsBenefice),
     get_best_action(AllPotentialActionsBenefice, [BestAction|_BestBenefice]),
 
     % The state of the environment has been changed
