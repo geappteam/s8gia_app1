@@ -47,7 +47,7 @@ threatLevelAt(BoardState, EvaluatedPosition, Threat) :-
     BoardState = [_N, _M, _C, _R, PlayerList, _B],
     addThreats(PlayerList, Preciousness, EvaluatedPosition, Threat).
 
-addThreats([], _Preciousness, 0).
+addThreats([], _Preciousness,_EvaluatedPosition, 0).
 addThreats([[_Id, Name, X, Y, BlockValue]|PlayerListTail], Preciousness, EvaluatedPosition, TotalThreat) :-
     \+ p06_nom(Name),
     BlockValue < Preciousness,!,
