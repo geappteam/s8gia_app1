@@ -2,22 +2,20 @@
 :- use_module(library(lists)).
 
 
+% List of valid actions
+is_action(move(Direction)) :- between(1, 8, Direction).
+is_action(attack(Direction)) :- between(1, 8, Direction).
+is_action(drop(Direction)) :- between(1, 8, Direction).
+is_action(take(Direction)) :- between(1, 8, Direction).
+is_action(none).
 
 
 % Valid state operations
-modify_state(move(Direction), OriginalState, TransformedState) :-
-    between(1, 8, Direction),
-    move(Direction, OriginalState, TransformedState).
-modify_state(take(Direction), OriginalState, TransformedState) :-
-    between(1, 8, Direction),
-    take(Direction, OriginalState, TransformedState).
-modify_state(drop(Direction), OriginalState, TransformedState) :-
-    between(1, 8, Direction),
-    drop(Direction, OriginalState, TransformedState).
-modify_state(attack(Direction), OriginalState, TransformedState) :-
-    between(1, 8, Direction),
-    attack(Direction, OriginalState, TransformedState).
 modify_state(none, State, State).
+modify_state(Action, OriginalState, TransformedState) :-
+    is_action(Action),
+    Action \= none,
+    call(Action, OriginalState, TransformedState).
 
 
 
@@ -142,8 +140,7 @@ directionTransform(8, [X, Y], [Xout, Yout]) :- Xout is X - 1, Yout is Y + 1.
 
 % Collision Detection to ensure validity of move
 noCollisions([_N, _M, _C, _R, PlayerList, BlockList]) :-
-    empty_set(EmptySet),
-    addPlayersToSet(PlayerList, EmptySet, PlayerSet),
+    addPlayersToSet(PlayerList, [], PlayerSet),
     addBlocksToSet(BlockList, PlayerSet, _).
 
 addBlocksToSet([], Set, Set).

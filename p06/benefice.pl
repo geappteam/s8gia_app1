@@ -1,5 +1,5 @@
 :- ensure_loaded(p06).
-:- ensure_loaded(state_ops).
+:- ensure_loaded(actions).
 
 
 

@@ -1,13 +1,6 @@
 :- ensure_loaded('../lib/stack').
+:- ensure_loaded(actions).
 
-% Actions definitions
-% + Any of the five possible actions.
-% Note : Helps categorize 'actions with any directions'.
-is_action(move(_Direction)).
-is_action(attack(_Direction)).
-is_action(drop(_Direction)).
-is_action(take(_Direction)).
-is_action(none).
 
 % + InitialState : Current environment's state.
 % + [] : Empty BestActionsStack stack which starts a stack of duos of
