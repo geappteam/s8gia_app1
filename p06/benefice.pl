@@ -1,5 +1,31 @@
 :- ensure_loaded(p06).
 :- ensure_loaded(actions).
+:- use_module(library(lists)).
+
+
+
+
+
+% Simple Best First Heuristic
+blockBlitzHeuristic(BoardState, Value) :-
+    stateEval(BoardState, Quality),
+    Value is 1 / Quality.
+
+% Simple Goal Condition
+blockBlitzGoal(BoardState) :-
+    heldBlockValue(BoardState, MaxBlock),
+    maxBlockOnField(BoardState, [MaxBlock, _BlockPosition]),
+    playerAtLowestThreat(BoardState).
+
+playerAtLowestThreat(BoardState) :-
+    BoardState = [_N, _M, C, R, _P, _B],
+    threatLevel(BoardState, MinThreat),
+    Mci is C - 1, Mri is R - 1,
+    between(0, Mci, X),
+    between(0, Mri, Y),
+    findall(Threat, threatLevelAt(BoardState, [X, Y], Threat), ThreatList),
+    min_list(ThreatList, MinThreat).
+
 
 
 
@@ -52,12 +78,16 @@ addThreats([[_Id, Name, X, Y, BlockValue]|PlayerListTail], Preciousness, Evaluat
     \+ p06_nom(Name),
     BlockValue < Preciousness,!,
     distance([X, Y], EvaluatedPosition, Distance),
-    Threat is (BlockValue / (BlockValue + Preciousness)) / (Distance ** 2),
+    pThreat(BlockValue, Preciousness, ProbT),
+    Threat is ProbT / (Distance ** 2),
     addThreats(PlayerListTail, Preciousness, EvaluatedPosition, OtherThreats),
     TotalThreat is Threat + OtherThreats.
 addThreats([_NotThreat|PlayerListTail], Preciousness, EvaluatedPosition, Threat) :-
     addThreats(PlayerListTail, Preciousness, EvaluatedPosition, Threat).
 
+pThreat(0, _DefenderValue, 0.25) :- !.
+pThreat(AttackerValue, DefenderValue, ProbEx) :-
+    ProbEx is AttackerValue / (AttackerValue + DefenderValue).
 
 
 
