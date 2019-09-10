@@ -2,7 +2,6 @@
 :- ensure_loaded('../lib/queue').
 
 
-
 % Used in priority queue
 precedes([Cost1, _State1, _Parent1], [Cost2, _Stat2, _Parent2]) :- Cost1 < Cost2.
 

@@ -25,7 +25,6 @@ playerAtLowestThreat(BoardState) :-
 
 
 
-
 % Specific value of action
 benefice(Action, BoardState, Benefice) :-
     modify_state(Action, BoardState, NewBoardState),
@@ -41,7 +40,7 @@ stateEval(BoardState, Total) :-
     blockReward(BoardState, BlockReward),
     potentialGain(BoardState, PotentialGain),
     threatLevel(BoardState, ThreatLevel),
-    Kb is 1, Kp is 1, Kt is 1,
+    Kb is 1, Kp is 1, Kt is 2,
     Total is Kb * BlockReward + Kp * PotentialGain - Kt * ThreatLevel.
 
 
