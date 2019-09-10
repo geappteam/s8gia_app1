@@ -1,10 +1,6 @@
 :- ensure_loaded(actions).
 :- ensure_loaded('../lib/queue').
 
-gprint([]).
-gprint([Ele|Tail]) :-
-    print(Ele), nl,
-    gprint(Tail).
 
 
 % Used in priority queue

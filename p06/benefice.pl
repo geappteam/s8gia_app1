@@ -18,12 +18,8 @@ blockBlitzGoal(BoardState) :-
     playerAtLowestThreat(BoardState).
 
 playerAtLowestThreat(BoardState) :-
-    BoardState = [_N, _M, C, R, _P, _B],
     threatLevel(BoardState, MinThreat),
-    Mci is C - 1, Mri is R - 1,
-    between(0, Mci, X),
-    between(0, Mri, Y),
-    findall(Threat, threatLevelAt(BoardState, [X, Y], Threat), ThreatList),
+    findall(Threat, threatLevelAt(BoardState, _Pos, Threat), ThreatList),
     min_list(ThreatList, MinThreat).
 
 
@@ -70,10 +66,19 @@ threatLevelAt(BoardState, _Position, 0) :-
     heldBlockValue(BoardState, 0).
 threatLevelAt(BoardState, EvaluatedPosition, Threat) :-
     heldBlockValue(BoardState, Preciousness),
-    BoardState = [_N, _M, _C, _R, PlayerList, _B],
+    BoardState = [_N, _M, C, R, PlayerList, _B],
+    positionInbound([C, R], EvaluatedPosition),
     addThreats(PlayerList, Preciousness, EvaluatedPosition, Threat).
 
 addThreats([], _Preciousness, _EvaluatedPosition, 0).
+addThreats([[_Id, Name, X, Y, BlockValue]|PlayerListTail], Preciousness, EvaluatedPosition, TotalThreat) :-
+    \+ p06_nom(Name),
+    BlockValue < Preciousness,
+    distance([X, Y], EvaluatedPosition, 0),!,
+    pThreat(BlockValue, Preciousness, ProbT),
+    Threat is ProbT / 0.5,
+    addThreats(PlayerListTail, Preciousness, EvaluatedPosition, OtherThreats),
+    TotalThreat is Threat + OtherThreats.
 addThreats([[_Id, Name, X, Y, BlockValue]|PlayerListTail], Preciousness, EvaluatedPosition, TotalThreat) :-
     \+ p06_nom(Name),
     BlockValue < Preciousness,!,
@@ -142,6 +147,7 @@ maxPlayerBlock([[_Id, _Name, X, Y, B]|PlayerListTail], MaxBlock) :-
     maxPlayerBlock(PlayerListTail, SubsequentMaxBlock),
     greaterBlock([B, [X,Y]], SubsequentMaxBlock, MaxBlock).
 
+maxLayingBlock([], [0, _BlockPos]).
 maxLayingBlock([[B, X, Y]|[]], [B, [X,Y]]) :- !.
 maxLayingBlock([[B, X, Y]|BlockListTail], MaxBlock) :-
     maxLayingBlock(BlockListTail, SubsequentMaxBlock),

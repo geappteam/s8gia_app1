@@ -21,7 +21,7 @@ p06_plan(Plan) :-
 p06_action(State, Action) :-
     bestFirstPlan(State, modify_state, blockBlitzGoal, blockBlitzHeuristic, Plan),
     append(Plan, [none], [Action|CompletePlan]),
-    setPlan(CompletePlan).
+    setPlan([Action|CompletePlan]).
 
 
 
