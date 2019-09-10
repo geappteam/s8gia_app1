@@ -21,14 +21,12 @@ p06_action(State, Action) :-
 initPlan(P) :-
     p06_action(State, _),
     make_plan(State, [], P).
-
 restOfPlan(P) :-
     p06_action(State, _),
     make_plan(State, [], P).
-
-getPlan(P) :-
+getPlan(State,P) :-
     with_mutex(p06, restOfPlan(P)),
-    make_plan().
+    make_plan(State, [], P).
 setPlan(P) :-
     with_mutex(p06, changePlan(P)).
 changePlan(P) :-
@@ -36,8 +34,8 @@ changePlan(P) :-
     assert(restOfPlan(P)).
 
 % Actions
-getAction(State, NextAction) :-
-    getPlan(State, [NextAction]), !, initPlan(P), setPlan(P).
+%getAction(State, NextAction) :-
+%    getPlan(State, [NextAction]), !, initPlan(P), setPlan(P).
 getAction(State, NextAction) :-
     getPlan(State, [NextAction|RestPlan]), setPlan(RestPlan).
 
