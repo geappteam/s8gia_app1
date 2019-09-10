@@ -18,7 +18,7 @@ benefice(Action, BoardState, 0) :-
 stateEval(BoardState, Total) :-
     blockReward(BoardState, BlockReward),
     potentialGain(BoardState, PotentialGain),
-    threat_level(BoardState, ThreatLevel),
+    threatLevel(BoardState, ThreatLevel),
     Kb is 1, Kp is 1, Kt is 1,
     Total is Kb * BlockReward + Kp * PotentialGain - Kt * ThreatLevel.
 
@@ -36,27 +36,28 @@ blockReward(BoardState, BlockReward) :-
 
 
 % Enemy Threat heuristic
-threat_level(_BoardState, 0) :-
-    % Enemies don't any interest toward the AI's possession
-    heldBlockValue(_BoardState, 0).
+threatLevel(BoardState, Threat) :-
+    playerPosition(BoardState, PlayerPos),
+    threatLevelAt(BoardState, PlayerPos, Threat).
 
-threat_level(BoardState, ThreatLevel) :-
-    % Check if enemies would have an interest toward the AI concerning its current possesion.
-    heldBlockValue(BoardState, BlockValue),
-    BlockValue > 0,
+threatLevelAt(BoardState, _Position, 0) :-
+    heldBlockValue(BoardState, 0).
+threatLevelAt(BoardState, EvaluatedPosition, Threat) :-
+    heldBlockValue(BoardState, Preciousness),
+    BoardState = [_N, _M, _C, _R, PlayerList, _B],
+    addThreats(PlayerList, Preciousness, EvaluatedPosition, Threat).
 
-    % Check BoardState if there're enemies not holding blocks or holding blocks with lesser values than the AI.
-    count_threats(BoardState, ListThreats, NumberThreats),
-    NumberThreats > 0,
+addThreats([], _Preciousness, 0).
+addThreats([[_Id, Name, X, Y, BlockValue]|PlayerListTail], Preciousness, EvaluatedPosition, TotalThreat) :-
+    \+ p06_nom(Name),
+    BlockValue < Preciousness,!,
+    distance([X, Y], EvaluatedPosition, Distance),
+    Threat is (BlockValue / (BlockValue + Preciousness)) / (Distance ** 2),
+    addThreats(PlayerListTail, Preciousness, EvaluatedPosition, OtherThreats),
+    TotalThreat is Threat + OtherThreats.
+addThreats([_NotThreat|PlayerListTail], Preciousness, EvaluatedPosition, Threat) :-
+    addThreats(PlayerListTail, Preciousness, EvaluatedPosition, Threat).
 
-    % Sum and ouput the threat level of the AI's position according to a specific board state.
-    sum_individual_threats(ListThreats, ThreatLevel).
-
-%TODO
-%count_threats()
-
-%TODO
-%sum_individual_threats()
 
 
 
@@ -64,8 +65,8 @@ threat_level(BoardState, ThreatLevel) :-
 
 % Compute Proximity to Winning Block Heuristic
 potentialGain(BoardState, BlockReward) :-
-    playerPosition(BoardState, PlayerPos),
-    playerGoalGradient(BoardState, Position, BlockReward).
+    playerPosition(BoardState, PlayerPosition),
+    playerGoalGradient(BoardState, PlayerPosition, BlockReward).
 
 playerGoalGradient(BoardState, _Position, BlockReward) :-
     heldBlockValue(BoardState, BlockReward),
@@ -93,7 +94,7 @@ distance([X1, Y1], [X2, Y2], Dx) :-
     Dx is abs(X2 - X1),
     Dy is abs(Y2 - Y1),
     Dx > Dy, !.
-distance([X1, Y1], [X2, Y2], Dy) :-
+distance([_X1, Y1], [_X2, Y2], Dy) :-
     Dy is abs(Y2 - Y1).
 
 
@@ -113,7 +114,7 @@ maxPlayerBlock([[_Id, _Name, X, Y, B]|PlayerListTail], MaxBlock) :-
 
 maxLayingBlock([[B, X, Y]|[]], [B, [X,Y]]) :- !.
 maxLayingBlock([[B, X, Y]|BlockListTail], MaxBlock) :-
-    maxLayingBlock(BlockListTail, SubsequentMaxBloc),
+    maxLayingBlock(BlockListTail, SubsequentMaxBlock),
     greaterBlock([B, [X,Y]], SubsequentMaxBlock, MaxBlock).
 
 greaterBlock([BlockValue1, _BlockPos1], [BlockValue2, BlockPos2], [BlockValue2, BlockPos2]) :-

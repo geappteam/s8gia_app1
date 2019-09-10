@@ -1,3 +1,5 @@
+:- ensure_loaded('../lib/stack').
+
 % Actions definitions
 % + Any of the five possible actions.
 % Note : Helps categorize 'actions with any directions'.
