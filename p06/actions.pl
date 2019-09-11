@@ -173,5 +173,6 @@ noBlockOutOfBounds(Columns, Rows, [[_Id, X, Y]|BlockListTail]) :-
     noBlockOutOfBounds(Columns, Rows, BlockListTail).
 
 positionInbound([C, R], [X, Y]) :-
-    X >= 0, X < C,
-    Y >= 0, Y < R.
+    Mci is C - 1, Mri is R - 1,
+    between(0, Mci, X),
+    between(0, Mri, Y).
