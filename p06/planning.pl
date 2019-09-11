@@ -1,9 +1,10 @@
 :- ensure_loaded('../lib/stack').
 :- ensure_loaded(actions).
 
-get_best_action([Action,Benefice],[Action,Benefice]) :-
-   write('Action :'), write(Action), nl,nl,
-   write('Benefice :'), write(Benefice), nl,nl.
+%get_best_action([Action,Benefice],[Action,Benefice]).
+%:-
+   %write('Action :'), write(Action), nl,nl,
+   %write('Benefice :'), write(Benefice), nl,nl.
 
 get_best_action([[_TopAction,TopBenefice],[SecondAction,SecondBenefice]], [[SecondAction,SecondBenefice]]) :-
     %write(SecondAction), nl,nl,
@@ -32,8 +33,9 @@ get_best_action([[TopAction,TopBenefice],[_SecondAction,SecondBenefice]|Tail], B
 % - NewActionPlan : New queue of actions to do.
 % Note : Outputs NewActionPlan equals to ActionPlan. Stops recursivity
 % once 'none' action appears as last best action to do.
-make_plan(_InitState, Plan, Plan) :-
-     member_stack(none, Plan).
+make_plan(_InitState, Plan, Plan):-
+    nl, write('Plan : '), write(Plan), nl,nl,
+    member_stack(none, Plan).
 
 % + InitState : Initial state of the environment.
 % + ActionPlan : Empty queue of actions to do so far.
@@ -46,6 +48,8 @@ make_plan(InitState, [], NewActionPlan) :-
 
     % The state of the environment has been changed
     modify_state(BestAction, InitState, InitState2),
+
+     nl,write('NewActionPlan : '), write(NewActionPlan), nl,nl,
 
     % Recursivity & add next action to the action plan
     make_plan(InitState2, [BestAction], NewActionPlan).
@@ -64,7 +68,9 @@ make_plan(InitState, InitialPlan, NewActionPlan) :-
     modify_state(BestAction, InitState, InitState2),
 
     % Append new action at the end
-    append([BestAction], InitialPlan, IncrementalPlan),
+    append(InitialPlan, [BestAction], IncrementalPlan),
+
+    nl,write('NewActionPlan : '), write(NewActionPlan), nl,nl,
 
     % Recursivity & add next action to the action plan
     make_plan(InitState2, IncrementalPlan, NewActionPlan).
