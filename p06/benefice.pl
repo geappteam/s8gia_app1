@@ -1,5 +1,26 @@
 :- ensure_loaded(p06).
 :- ensure_loaded(actions).
+:- use_module(library(lists)).
+
+
+
+
+
+% Simple Best First Heuristic
+blockBlitzHeuristic(BoardState, Value) :-
+    stateEval(BoardState, Quality),
+    Value is 1 / Quality.
+
+% Simple Goal Condition
+blockBlitzGoal(BoardState) :-
+    heldBlockValue(BoardState, MaxBlock),
+    maxBlockOnField(BoardState, [MaxBlock, _BlockPosition]),
+    playerAtLowestThreat(BoardState).
+
+playerAtLowestThreat(BoardState) :-
+    threatLevel(BoardState, MinThreat),
+    findall(Threat, threatLevelAt(BoardState, _Pos, Threat), ThreatList),
+    min_list(ThreatList, MinThreat).
 
 
 
@@ -19,7 +40,7 @@ stateEval(BoardState, Total) :-
     blockReward(BoardState, BlockReward),
     potentialGain(BoardState, PotentialGain),
     threatLevel(BoardState, ThreatLevel),
-    Kb is 1, Kp is 1, Kt is 1,
+    Kb is 1, Kp is 1, Kt is 2,
     Total is Kb * BlockReward + Kp * PotentialGain - Kt * ThreatLevel.
 
 
@@ -44,20 +65,33 @@ threatLevelAt(BoardState, _Position, 0) :-
     heldBlockValue(BoardState, 0).
 threatLevelAt(BoardState, EvaluatedPosition, Threat) :-
     heldBlockValue(BoardState, Preciousness),
-    BoardState = [_N, _M, _C, _R, PlayerList, _B],
+    BoardState = [_N, _M, C, R, PlayerList, _B],
+    positionInbound([C, R], EvaluatedPosition),
     addThreats(PlayerList, Preciousness, EvaluatedPosition, Threat).
 
-addThreats([], _Preciousness,_EvaluatedPosition, 0).
+addThreats([], _Preciousness, _EvaluatedPosition, 0).
+addThreats([[_Id, Name, X, Y, BlockValue]|PlayerListTail], Preciousness, EvaluatedPosition, TotalThreat) :-
+    \+ p06_nom(Name),
+    BlockValue < Preciousness,
+    distance([X, Y], EvaluatedPosition, 0),!,
+    pThreat(BlockValue, Preciousness, ProbT),
+    Threat is ProbT / 0.5,
+    addThreats(PlayerListTail, Preciousness, EvaluatedPosition, OtherThreats),
+    TotalThreat is Threat + OtherThreats.
 addThreats([[_Id, Name, X, Y, BlockValue]|PlayerListTail], Preciousness, EvaluatedPosition, TotalThreat) :-
     \+ p06_nom(Name),
     BlockValue < Preciousness,!,
     distance([X, Y], EvaluatedPosition, Distance),
-    Threat is (BlockValue / (BlockValue + Preciousness)) / (Distance ** 2),
+    pThreat(BlockValue, Preciousness, ProbT),
+    Threat is ProbT / (Distance ** 2),
     addThreats(PlayerListTail, Preciousness, EvaluatedPosition, OtherThreats),
     TotalThreat is Threat + OtherThreats.
 addThreats([_NotThreat|PlayerListTail], Preciousness, EvaluatedPosition, Threat) :-
     addThreats(PlayerListTail, Preciousness, EvaluatedPosition, Threat).
 
+pThreat(0, _DefenderValue, 0.25) :- !.
+pThreat(AttackerValue, DefenderValue, ProbEx) :-
+    ProbEx is AttackerValue / (AttackerValue + DefenderValue).
 
 
 
@@ -112,6 +146,7 @@ maxPlayerBlock([[_Id, _Name, X, Y, B]|PlayerListTail], MaxBlock) :-
     maxPlayerBlock(PlayerListTail, SubsequentMaxBlock),
     greaterBlock([B, [X,Y]], SubsequentMaxBlock, MaxBlock).
 
+maxLayingBlock([], [0, _BlockPos]).
 maxLayingBlock([[B, X, Y]|[]], [B, [X,Y]]) :- !.
 maxLayingBlock([[B, X, Y]|BlockListTail], MaxBlock) :-
     maxLayingBlock(BlockListTail, SubsequentMaxBlock),
